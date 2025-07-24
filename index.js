@@ -29,7 +29,7 @@ async function verificar() {
 
     if (novas.length > 0) {
       console.log(`🟢 ${novas.length} novas TbSaidas Registradas`);
-      console.log(`🟢 ${novas.length} novas TbSaidas`);
+      console.log(`🟢 Executando Loop de Saídas para enviar para o Webhook...`);
 
       for (const saida of novas) {
         await axios.post(webhookUrl, saida);
