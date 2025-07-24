@@ -28,7 +28,7 @@ async function buscarNovasSaidas(numeroRef) {
 
   const result = await sql.query`
     SELECT * FROM tbSaidas
-    WHERE Num_docto > ${numeroRef} AND Cod_docto = 'NE'
+    WHERE Num_docto > ${numeroRef} AND Cod_docto = 'NE' AND Num_docto != '517663'
     ORDER BY Num_docto DESC
   `;
 
