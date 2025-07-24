@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios');
 require('dotenv').config();
 const { buscarNovasSaidas } = require('./db');
 
@@ -36,29 +35,27 @@ async function verificar() {
               typeof v === 'bigint' ? v.toString() : v
           ));
 
-          console.log('🔍 Enviando payload:', JSON.stringify(payload, null, 2));
+          console.log('🔍 Enviando payload via fetch:', payload);
 
-          await axios({
-            method: 'post',
-            url: webhookUrl,
-            data: payload,
+          const res = await fetch(webhookUrl, {
+            method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json'
             },
-            maxBodyLength: Infinity,
-            maxContentLength: Infinity
+            body: JSON.stringify(payload),
           });
 
-          console.log('✅ Webhook enviado');
-        } catch (e) {
-          console.error('❌ Falha ao enviar payload:', e.message || e);
+          if (!res.ok) throw new Error(`Status ${res.status}`);
+          console.log('✅ Webhook enviado com POST via fetch');
+        } catch (err) {
+          console.error('❌ Erro no fetch:', err.message);
         }
       }
       const maisRecente = novas.reduce((max, s) =>
-        s.Num_docto > max.Num_docto ? s : max
+        s.Numero_Nota > max.Numero_Nota ? s : max
       );
-      salvarUltimoNumero(maisRecente.Num_docto);
+      salvarUltimoNumero(maisRecente.Numero_Nota);
     } else {
       console.log('🔍 Nenhuma nova saída encontrada');
     }
