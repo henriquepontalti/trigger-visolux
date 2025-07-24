@@ -28,7 +28,8 @@ async function verificar() {
     const novas = await buscarNovasSaidas(ultimaData);
 
     if (novas.length > 0) {
-      console.log(`🟢 ${novas.length} novas saídas encontradas`);
+      console.log(`🟢 ${novas.length} novas TbSaidas Registradas`);
+      console.log(`🟢 ${novas.length} novas TbSaidas`);
 
       for (const saida of novas) {
         await axios.post(webhookUrl, saida);
@@ -49,5 +50,4 @@ async function verificar() {
 
 setInterval(verificar, intervalo);
 console.log('⏳ Iniciando monitoramento...');
-verificar(); // já executa ao iniciar
-
+verificar();
