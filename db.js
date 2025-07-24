@@ -23,12 +23,13 @@ async function conectar() {
   }
 }
 
-async function buscarNovasSaidas(dataRef) {
+async function buscarNovasSaidas(numeroRef) {
   await conectar();
 
   const result = await sql.query`
     SELECT * FROM tbSaidas
-    WHERE Data_movto > ${dataRef} AND Cod_docto = 'NE'
+    WHERE Num_docto > ${numeroRef} AND Cod_docto = 'NE'
+    ORDER BY Num_docto DESC
   `;
 
   return result.recordset;

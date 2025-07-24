@@ -4,28 +4,28 @@ const axios = require('axios');
 require('dotenv').config();
 const { buscarNovasSaidas } = require('./db');
 
-const caminhoJson = path.join(__dirname, 'ultima-data.json');
+const caminhoJson = path.join(__dirname, 'ultimo-numero.json');
 const webhookUrl = process.env.WEBHOOK_URL;
 const intervalo = parseInt(process.env.INTERVALO_MS || '30000');
 
-function lerUltimaData() {
+function lerUltimoNumero() {
   try {
     const data = fs.readFileSync(caminhoJson, 'utf8');
-    return new Date(JSON.parse(data).ultimaData);
+    return parseInt(JSON.parse(data).ultimoNumero, 10);
   } catch (e) {
-    return new Date(process.env.DATA_INICIAL);
+    return parseInt(process.env.NUM_INICIAL, 10);
   }
 }
 
-function salvarUltimaData(data) {
-  fs.writeFileSync(caminhoJson, JSON.stringify({ ultimaData: data }));
+function salvarUltimoNumero(numero) {
+  fs.writeFileSync(caminhoJson, JSON.stringify({ ultimoNumero: numero }));
 }
 
 async function verificar() {
-  const ultimaData = lerUltimaData();
+  const ultimoNumero = lerUltimoNumero();
 
   try {
-    const novas = await buscarNovasSaidas(ultimaData);
+    const novas = await buscarNovasSaidas(ultimoNumero);
 
     if (novas.length > 0) {
       console.log(`🟢 ${novas.length} novas TbSaidas Registradas`);
@@ -36,10 +36,10 @@ async function verificar() {
         console.log('✅ Webhook enviado para:', saida);
       }
 
-      const maisRecente = novas.reduce((max, s) => 
-        new Date(s.Data_movto) > new Date(max.Data_movto) ? s : max
+      const maisRecente = novas.reduce((max, s) =>
+        s.Num_docto > max.Num_docto ? s : max
       );
-      salvarUltimaData(maisRecente.Data_movto);
+      salvarUltimoNumero(maisRecente.Num_docto);
     } else {
       console.log('🔍 Nenhuma nova saída encontrada');
     }
