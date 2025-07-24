@@ -30,12 +30,31 @@ async function verificar() {
     if (novas.length > 0) {
       console.log(`🟢 ${novas.length} novas TbSaidas Registradas`);
       console.log(`🟢 Executando Loop de Saídas para enviar para o Webhook...`);
-
       for (const saida of novas) {
-        await axios.post(webhookUrl, saida);
-        console.log('✅ Webhook enviado para:', saida);
-      }
+        try {
+          const payload = JSON.parse(JSON.stringify(saida, (_, v) =>
+              typeof v === 'bigint' ? v.toString() : v
+          ));
 
+          console.log('🔍 Enviando payload:', JSON.stringify(payload, null, 2));
+
+          await axios({
+            method: 'post',
+            url: webhookUrl,
+            data: payload,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            maxBodyLength: Infinity,
+            maxContentLength: Infinity
+          });
+
+          console.log('✅ Webhook enviado');
+        } catch (e) {
+          console.error('❌ Falha ao enviar payload:', e.message || e);
+        }
+      }
       const maisRecente = novas.reduce((max, s) =>
         s.Num_docto > max.Num_docto ? s : max
       );
